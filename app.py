@@ -1,5 +1,5 @@
-from flask import Flask, render_template
-import unirest, json, uuid, request
+from flask import Flask, render_template, request
+import unirest, json, uuid
 from models import Session, Account, Item
 from OpenSSL import SSL
 
