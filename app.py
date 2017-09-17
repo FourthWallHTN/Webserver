@@ -22,8 +22,6 @@ square_access_token = 'sandbox-sq0atb-VGm6YqbVmufgp9MHE3j1FQ'
 @app.route('/seller')
 def seller():
     items = session.query(Item).order_by(Item.id.asc()).all()
-    inventory_count = "100"
-    revenue = "$1200"
 	return render_template("dashboard.html", items=items)
 
 # Display buyer page to connect accounts for Coinbase and Square, see history/info/etc
