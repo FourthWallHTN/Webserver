@@ -1,8 +1,8 @@
+from __future__ import print_function
 from flask import Flask, render_template
 import unirest, json, uuid
 
-# Cockroach DB imports
-from __future__ import print_function
+# SQLAlchemy imports
 from sqlalchemy import create_engine, Column, Integer
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
@@ -28,13 +28,14 @@ def initDB():
 	class Account(Base):
 	    __tablename__ = 'accounts'
 	    id = Column(Integer, primary_key=True)
-	    balance = Column(Integer)
-	    card_nonce = Column(Integer)
+	    #balance = Column(Integer)
+	    card = Column(Integer)
 
 	# The Items class corresponds to the "items" database table.
 	class Item(Base):
 	    __tablename__ = 'items'
 	    id = Column(Integer, primary_key=True)
+	    name = Column(String)
 	    count = Column(Integer)
 	    sold = Column(Integer)
 	    price = Column(Float)
@@ -50,8 +51,16 @@ def initDB():
 	# Insert two rows into the "accounts" table.
 	session = Session()
 	session.add_all([
-	    Account(id=1, balance=1000, card_nonce = ),
-	    Account(id=2, balance=250, card_nonce = ),
+	    Account(id=1, card=4532759734545858 ),	# Visa
+	    Account(id=2, card=5409889944179029),	# MasterCard
+	    Account(id=3, card=6011033621379697),	# Discover
+	    Account(id=4, card=36004244846408),		# Diners Club
+	    Account(id=5, card=3566005734880650),	# JCB
+	    Account(id=6, card=371263462726550),	# American Express
+	    Account(id=7, card=6222520119138184),	# China UnionPay
+	    Item(id=1, name="Chair", count=20, sold=0, price=39.99),
+	    Item(id=2, name="Table", count=10, sold=0, price=89.99),
+	    Item(id=3, name="Lamp", count=10, sold=0, price=25.99),
 	])
 	session.commit()
 
@@ -63,12 +72,26 @@ def initDB():
 @app.route('/')
 @app.route('/seller')
 def seller():
+	# revenue = calculateRevenue()
+
 	return render_template("dashboard.html")
+
+# def calculateRevenue():
+# 	revenue = 0
+	
+# 	return revenue
 
 # Display buyer page to connect accounts for Coinbase and Square, see history/info/etc
 @app.route('/buyer')
 def buyer():
-	pass
+	return render_template("paymentForm.html", application_id = square_application_id, postal_code="94103",expiration_date="04/20",card_number="4532759734545858",cvv="111")
+
+# Display item info
+@app.route('/item/<int:item_id>')
+def display_item_info(item_id):
+	#item_name = Item.query() # (SELECT name FROM items WHERE id = item_id);
+	item_price = "$" + str(35.99)
+	return render_template("table.html", item_name="Chair", item_price=item_price)
 
 # Execute payment through Square API
 @app.route('/pay/square/<int:item_id>', methods=['GET','POST'])
@@ -107,4 +130,4 @@ def coinbase(item_id):
 
 if __name__ == "__main__":
 	app.debug = True
-	app.run('0.0.0.0', port=8000)
+	app.run('0.0.0.0', port=8000, ssl_context='adhoc')		
