@@ -63,12 +63,15 @@ def cart():
         return render_template("cart.html", items=items)
 
 # Execute payment through Square API
-@app.route('/pay/square/<int:item_id>', methods=['GET','POST'])
-def square(item_id):
+@app.route('/pay/square', methods=['POST'])
+def square():
 
 	# Sandbox Location ID (Coffee & Toffee NYC)
 	location_id = 'CBASEEKdEq0dwQd9aigzQlUVGhYgAQ'
-	card_nonce = 'FAKE_CARD_NONCE'
+	card_nonce = request.form
+
+	items = [{"total": cart_items[i.id]['count'] * i.price, "count": cart_items[i.id]['count'],
+                  "name": i.name, "price": i.price} for i in session.query(Item).all() if i.id in cart_items]
 
 	response = unirest.post('https://connect.squareup.com/v2/locations/' + location_id + '/transactions',
 		headers={
@@ -79,7 +82,7 @@ def square(item_id):
 		params = json.dumps({
 			'card_nonce': card_nonce,
 			'amount_money': {
-			        'amount': 100,
+			        'amount': items['total'],
 			        'currency': 'CAD'
 			},
 			'idempotency_key': str(uuid.uuid1())
@@ -87,10 +90,6 @@ def square(item_id):
 	)
 
 	return json.dumps(response.body)
-
-# Generate card nonce for Square payment
-def newCardNonce():
-	pass
 
 # Execute payment through Coinbase API
 @app.route('/pay/coinbase/<int:item_id>', methods=['GET','POST'])
