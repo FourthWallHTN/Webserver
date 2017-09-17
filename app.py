@@ -4,7 +4,7 @@ from models import Session, Account, Item
 from OpenSSL import SSL
 
 app = Flask(__name__)
-cart_itemse = {}
+cart_items = {}
 session = Session()
 
 ################
