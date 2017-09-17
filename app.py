@@ -4,7 +4,6 @@ from models import Session, Account, Item
 from OpenSSL import SSL
 
 app = Flask(__name__)
-cart_items = {}
 session = Session()
 
 ################
@@ -40,26 +39,26 @@ def display_item_info(item_id):
 
 @app.route('/reset')
 def reset():
-        cart_items = {}
+        session.query(Item).update({"sold": 0})
+        session.commit()
 
-@app.route('/add/<int:item_id>', methods=['POST'])
-def add():
-        if item_id in cart_items:
-                cart_items[item_id]['count'] += 1
-        else:
-                cart_items[item_id] = {'count': 1}
+@app.route('/add/<int:item_id>', methods=['GET', 'POST'])
+def add(item_id):
+        session.query(Item).filter(Item.id == item_id).update({"sold": Item.sold + 1})
+        session.commit()
+
         return 'All good in the hood! :)'
 
 @app.route('/remove/<int:item_id>', methods=['POST'])
-def remove():
-        if item_id in cart:
-                cart_items[item_id]['count'] = min(0, cart_items[item_id]['count'])
+def remove(item_id):
+        session.query(Item).filter(Item.id == item_id).update({"sold": Item.sold - 1})
+        session.commit()
         return 'OK'
 
 @app.route('/cart')
 def cart():
-        items = [{"total": cart_items[i.id]['count'] * i.price, "count": cart_items[i.id]['count'],
-                  "name": i.name, "price": i.price} for i in session.query(Item).all() if i.id in cart_items]
+        items = [{"total": i.sold * i.price, "count": i.sold,
+                  "name": i.name, "price": i.price} for i in session.query(Item).all()]
         return render_template("cart.html", items=items)
 
 # Execute payment through Square API
