@@ -67,7 +67,7 @@ def cart():
 def square():
 	
 	# Sandbox Location ID (Coffee & Toffee NYC)
-	card_nonce = 'CBASEMqVJaxEZ9YMl9XKxOMxF78gAQ'
+	card_nonce = 'CBASEO_uJKUcQWA6Kjz-RiJZs7cgAQ'
 	if request.form:
 		card_nonce = request.form
 		print("card nonce: ", card_nonce)
