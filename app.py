@@ -65,30 +65,36 @@ def cart():
 # Execute payment through Square API
 @app.route('/pay/square', methods=['POST'])
 def square():
+	if request.method == 'POST':
+		# Sandbox Location ID (Coffee & Toffee NYC)
+		card_nonce = ''
+		if request.form:
+			card_nonce = request.form
+			print("card nonce: ", card_nonce)
+		location_id = 'CBASEEKdEq0dwQd9aigzQlUVGhYgAQ'
+		#card_nonce = 
 
-	# Sandbox Location ID (Coffee & Toffee NYC)
-	location_id = 'CBASEEKdEq0dwQd9aigzQlUVGhYgAQ'
-	card_nonce = request.form
+		items = [{"total": cart_items[i.id]['count'] * i.price} for i in session.query(Item).all() if i.id in cart_items]
 
-	items = [{"total": cart_items[i.id]['count'] * i.price} for i in session.query(Item).all() if i.id in cart_items]
-
-	response = unirest.post('https://connect.squareup.com/v2/locations/' + location_id + '/transactions',
-		headers={
-			'Accept': 'application/json',
-			'Content-Type': 'application/json',
-			'Authorization': 'Bearer ' + square_access_token,
-		},
-		params = json.dumps({
-			'card_nonce': card_nonce,
-			'amount_money': {
-			        'amount': items['total'],
-			        'currency': 'CAD'
+		response = unirest.post('https://connect.squareup.com/v2/locations/' + location_id + '/transactions',
+			headers={
+				'Accept': 'application/json',
+				'Content-Type': 'application/json',
+				'Authorization': 'Bearer ' + square_access_token,
 			},
-			'idempotency_key': str(uuid.uuid1())
-		})
-	)
+			params = json.dumps({
+				'card_nonce': card_nonce,
+				'amount_money': {
+				        'amount': items['total'],
+				        'currency': 'CAD'
+				},
+				'idempotency_key': str(uuid.uuid1())
+			})
+		)
 
-	return json.dumps(response.body)
+		return json.dumps(response.body)
+	else:
+		return "Payment failed"
 
 # Execute payment through Coinbase API
 @app.route('/pay/coinbase/<int:item_id>', methods=['GET','POST'])
