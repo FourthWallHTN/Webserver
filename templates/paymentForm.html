@@ -73,8 +73,8 @@
               at the bottom of this sample, to correspond to the URL you want to
               submit the nonce to.
             */
-            document.getElementById('card-nonce').value = nonce;
-            document.getElementById('nonce-form').submit();
+            // document.getElementById('card-nonce').value = nonce;
+            // document.getElementById('nonce-form').submit();
 
           }
         },
@@ -175,8 +175,8 @@
       You should replace the action attribute of the form with the path of
       the URL you want to POST the nonce to (for example, "/process-card")
     -->
-    <form id="nonce-form" novalidate action="/pay/square" method="post">
-
+    <!-- <form id="nonce-form" novalidate action="/pay/square" method="post"> -->
+    <form id="nonce-form" novalidate action="REPLACE" method="post">
       <!--
         Whenever a nonce is generated, it's assigned as the value of this hidden
         input field.
