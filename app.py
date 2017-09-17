@@ -85,8 +85,8 @@ def square():
 		params = json.dumps({
 			'card_nonce': card_nonce,
 			'amount_money': {
-			        'amount': items[0]['total'],
-			        'currency': 'CAD'
+			        'amount': int(items[0]['total']),
+			        'currency': 'USD'
 			},
 			'idempotency_key': str(uuid.uuid1())
 		})
