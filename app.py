@@ -1,11 +1,6 @@
-from __future__ import print_function
 from flask import Flask, render_template
 import unirest, json, uuid
-
-# SQLAlchemy imports
-from sqlalchemy import create_engine, Column, Integer
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from models import Account, Item
 
 app = Flask(__name__)
 
@@ -16,54 +11,6 @@ app = Flask(__name__)
 square_application_id = 'sandbox-sq0idp-NMjTA4x9HyDSGNWXdwc2Pg'
 square_access_token = 'sandbox-sq0atb-VGm6YqbVmufgp9MHE3j1FQ'
 
-################
-### Database ###
-################
-
-def initDB():
-	# Create database
-	Base = declarative_base()
-
-	# The Account class corresponds to the "accounts" database table.
-	class Account(Base):
-	    __tablename__ = 'accounts'
-	    id = Column(Integer, primary_key=True)
-	    #balance = Column(Integer)
-	    card = Column(Integer)
-
-	# The Items class corresponds to the "items" database table.
-	class Item(Base):
-	    __tablename__ = 'items'
-	    id = Column(Integer, primary_key=True)
-	    name = Column(String)
-	    count = Column(Integer)
-	    sold = Column(Integer)
-	    price = Column(Float)
-
-	# Create an engine to communicate with the database. The "cockroachdb://" prefix
-	# for the engine URL indicates that we are connecting to CockroachDB.
-	engine = create_engine("cockroachdb://maxroach@localhost:26257/bank?sslmode=disable")
-	Session = sessionmaker(bind=engine)
-
-	# Automatically create the "accounts" and "items" tables based on the Account and Item classes.
-	Base.metadata.create_all(engine)
-
-	# Insert two rows into the "accounts" table.
-	session = Session()
-	session.add_all([
-	    Account(id=1, card=4532759734545858 ),	# Visa
-	    Account(id=2, card=5409889944179029),	# MasterCard
-	    Account(id=3, card=6011033621379697),	# Discover
-	    Account(id=4, card=36004244846408),		# Diners Club
-	    Account(id=5, card=3566005734880650),	# JCB
-	    Account(id=6, card=371263462726550),	# American Express
-	    Account(id=7, card=6222520119138184),	# China UnionPay
-	    Item(id=1, name="Chair", count=20, sold=0, price=39.99),
-	    Item(id=2, name="Table", count=10, sold=0, price=89.99),
-	    Item(id=3, name="Lamp", count=10, sold=0, price=25.99),
-	])
-	session.commit()
-
 ##############
 ### Routes ###
 ##############
@@ -73,8 +20,8 @@ def initDB():
 @app.route('/seller')
 def seller():
 	# revenue = calculateRevenue()
-
-	return render_template("dashboard.html")
+	def callback(session):
+		return render_template("dashboard.html", items=session.query(Item).order_by(Item.id.asc()).all())
 
 # def calculateRevenue():
 # 	revenue = 0
