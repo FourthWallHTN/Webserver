@@ -21,8 +21,10 @@ square_access_token = 'sandbox-sq0atb-VGm6YqbVmufgp9MHE3j1FQ'
 @app.route('/')
 @app.route('/seller')
 def seller():
-        items = session.query(Item).order_by(Item.id.asc()).all()
-	return render_template("dashboard.html", items=items)
+    items = session.query(Item).order_by(Item.id.asc()).all()
+    inventory_count = "100"
+    revenue = "$1200"
+	return render_template("dashboard.html", items=items, inventory_count=inventory_count, revenue=revenue)
 
 # Display buyer page to connect accounts for Coinbase and Square, see history/info/etc
 @app.route('/buyer')
@@ -63,7 +65,7 @@ def cart():
         return render_template("cart.html", items=items)
 
 # Execute payment through Square API
-@app.route('/pay/square')
+@app.route('/pay/square', methods=['GET','POST'])
 def square():
 	
 	# Sandbox Location ID (Coffee & Toffee NYC)
