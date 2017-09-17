@@ -74,7 +74,7 @@ def square():
 	location_id = 'CBASEEKdEq0dwQd9aigzQlUVGhYgAQ'
 	#card_nonce = 
 
-	items = [{"total": cart_items[i.id]['count'] * i.price} for i in session.query(Item).all()]
+	items = [{"total": i.sold * i.price} for i in session.query(Item).all()]
 
 	response = unirest.post('https://connect.squareup.com/v2/locations/' + location_id + '/transactions',
 		headers={
