@@ -41,6 +41,7 @@ def display_item_info(item_id):
 def reset():
         session.query(Item).update({"sold": 0})
         session.commit()
+        return 'reset'
 
 @app.route('/add/<int:item_id>', methods=['GET', 'POST'])
 def add(item_id):
